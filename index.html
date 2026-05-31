@@ -1,0 +1,911 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0c10;--bg2:#0f1218;--bg3:#161b24;--bg4:#1c2230;
+    --border:#ffffff14;--border2:#ffffff22;
+    --text:#e8eaf0;--text2:#8892a4;--text3:#4a5568;
+    --blue:#4f8ef7;--blue2:#2563eb;
+    --purple:#a855f7;--purple2:#7c3aed;
+    --gold:#f59e0b;--gold2:#d97706;
+    --red:#ef4444;--pink:#ec4899;--cyan:#06b6d4;
+    --green:#10b981;
+    --rare-gray:#8892a4;--rare-blue:#4f8ef7;--rare-purple:#a855f7;--rare-pink:#ec4899;--rare-red:#ef4444;--rare-gold:#f59e0b;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+
+  .app{display:flex;flex-direction:column;min-height:100vh}
+
+  /* NAV */
+  nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:100}
+  .nav-logo{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;color:#fff;letter-spacing:2px;margin-right:32px;cursor:pointer;background:linear-gradient(135deg,#4f8ef7,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .nav-links{display:flex;gap:4px;flex:1}
+  .nav-link{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;border:none;background:none;white-space:nowrap}
+  .nav-link:hover,.nav-link.active{color:#fff;background:var(--bg3)}
+  .nav-link.active{color:var(--blue)}
+  .nav-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .balance{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:500;color:var(--green)}
+  .btn-deposit{background:linear-gradient(135deg,var(--blue2),var(--purple2));border:none;color:#fff;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s}
+  .btn-deposit:hover{opacity:.85}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer}
+
+  /* PAGES */
+  .page{display:none;flex:1}
+  .page.active{display:block}
+
+  /* ====== HOME PAGE ====== */
+  .hero{background:var(--bg2);border-bottom:1px solid var(--border);padding:40px 24px;text-align:center;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% -20%,rgba(79,142,247,.12),transparent)}
+  .hero h1{font-family:'Rajdhani',sans-serif;font-size:48px;font-weight:700;letter-spacing:3px;line-height:1.1;margin-bottom:12px}
+  .hero h1 span{background:linear-gradient(135deg,#4f8ef7,#a855f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .hero p{color:var(--text2);font-size:15px;margin-bottom:24px}
+  .hero-btns{display:flex;gap:12px;justify-content:center}
+  .btn-primary{background:linear-gradient(135deg,var(--blue2),var(--purple2));border:none;color:#fff;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:transform .15s,opacity .15s}
+  .btn-primary:hover{transform:translateY(-1px);opacity:.9}
+  .btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text);padding:12px 28px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;transition:all .15s}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+
+  /* LIVE FEED */
+  .live-feed{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 0;overflow:hidden;white-space:nowrap}
+  .live-feed-inner{display:inline-flex;gap:0;animation:scroll 25s linear infinite}
+  .live-feed-inner:hover{animation-play-state:paused}
+  @keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  .feed-item{display:inline-flex;align-items:center;gap:8px;padding:4px 20px;border-right:1px solid var(--border)}
+  .feed-avatar{width:22px;height:22px;border-radius:50%;background:var(--bg4);font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .feed-nick{font-size:12px;color:var(--text2)}
+  .feed-item-name{font-size:12px;font-weight:500}
+  .feed-price{font-size:12px;font-weight:600}
+
+  /* SECTION */
+  .section{padding:32px 24px}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .section-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;letter-spacing:1px;color:#fff}
+  .section-title span{color:var(--blue)}
+  .see-all{font-size:13px;color:var(--blue);cursor:pointer;background:none;border:none}
+
+  /* CASES GRID */
+  .cases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+  .case-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+  .case-card:hover{border-color:var(--blue);transform:translateY(-2px);background:var(--bg4)}
+  .case-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .2s}
+  .case-card:hover::before{opacity:1}
+  .case-card.tier-gold::before{background:linear-gradient(90deg,var(--gold),transparent)}
+  .case-card.tier-red::before{background:linear-gradient(90deg,var(--red),transparent)}
+  .case-card.tier-purple::before{background:linear-gradient(90deg,var(--purple),transparent)}
+  .case-card.tier-blue::before{background:linear-gradient(90deg,var(--blue),transparent)}
+  .case-img{width:100%;aspect-ratio:1;object-fit:contain;margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:44px}
+  .case-name{font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .case-price{font-size:15px;font-weight:700;color:var(--gold)}
+  .case-badge{position:absolute;top:8px;right:8px;font-size:10px;padding:3px 7px;border-radius:4px;font-weight:600}
+  .badge-new{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+  .badge-hot{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+
+  /* BATTLES */
+  .battles-list{display:flex;flex-direction:column;gap:8px}
+  .battle-row{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .15s}
+  .battle-row:hover{border-color:var(--border2);background:var(--bg4)}
+  .battle-mode{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--blue);min-width:48px}
+  .battle-cases{flex:1;display:flex;gap:6px;align-items:center}
+  .battle-case-pill{background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--text2)}
+  .battle-bet{font-size:14px;font-weight:700;color:var(--gold);min-width:80px;text-align:right}
+  .battle-status{font-size:11px;padding:4px 10px;border-radius:6px;font-weight:600}
+  .status-waiting{background:rgba(79,142,247,.15);color:var(--blue);border:1px solid rgba(79,142,247,.3)}
+  .status-live{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3);animation:pulse-border .8s ease-in-out infinite}
+  @keyframes pulse-border{0%,100%{opacity:1}50%{opacity:.5}}
+  .battle-players{font-size:12px;color:var(--text2);min-width:50px;text-align:center}
+
+  /* ====== CASES PAGE ====== */
+  .cases-page{padding:24px}
+  .filter-bar{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+  .filter-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s}
+  .filter-btn:hover,.filter-btn.active{background:var(--bg4);border-color:var(--blue);color:var(--blue)}
+  .search-input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--text);outline:none;min-width:200px;flex:1}
+  .search-input::placeholder{color:var(--text3)}
+  .search-input:focus{border-color:var(--blue)}
+
+  /* ====== CASE OPEN PAGE ====== */
+  .case-open-page{padding:24px;max-width:900px;margin:0 auto}
+  .case-open-hero{text-align:center;margin-bottom:32px}
+  .case-open-hero .big-emoji{font-size:80px;display:block;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(168,85,247,.5))}
+  .case-open-hero h2{font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;letter-spacing:2px;margin-bottom:8px}
+  .case-open-hero .case-open-price{font-size:28px;font-weight:700;color:var(--gold)}
+
+  /* ROULETTE */
+  .roulette-container{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;overflow:hidden;position:relative}
+  .roulette-track-wrap{position:relative;overflow:hidden;border-radius:8px}
+  .roulette-track-wrap::before,.roulette-track-wrap::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none}
+  .roulette-track-wrap::before{left:0;background:linear-gradient(90deg,var(--bg2),transparent)}
+  .roulette-track-wrap::after{right:0;background:linear-gradient(-90deg,var(--bg2),transparent)}
+  .roulette-pointer{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:2px;background:var(--gold);z-index:3}
+  .roulette-pointer::before,.roulette-pointer::after{content:'';position:absolute;left:50%;transform:translateX(-50%);border:6px solid transparent}
+  .roulette-pointer::before{top:0;border-top-color:var(--gold)}
+  .roulette-pointer::after{bottom:0;border-bottom-color:var(--gold)}
+  .roulette-track{display:flex;gap:6px;padding:6px;transition:transform 4s cubic-bezier(.17,.67,.12,.99);will-change:transform}
+  .roulette-item{flex-shrink:0;width:100px;height:100px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px}
+  .roulette-item .r-emoji{font-size:32px}
+  .roulette-item .r-name{font-size:9px;color:var(--text2);text-align:center;line-height:1.2}
+  .roulette-item.highlight{border-color:var(--gold)!important;box-shadow:0 0 16px rgba(245,158,11,.3)}
+
+  .rarity-bar{display:flex;gap:4px;margin-top:12px;justify-content:center}
+  .rarity-dot{width:8px;height:8px;border-radius:50%}
+
+  /* ITEMS GRID */
+  .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:24px}
+  .item-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;position:relative}
+  .item-card .item-emoji{font-size:28px;margin-bottom:6px}
+  .item-card .item-name{font-size:11px;color:var(--text2);margin-bottom:4px;line-height:1.3}
+  .item-card .item-price{font-size:12px;font-weight:600}
+  .item-card .item-chance{position:absolute;top:6px;right:6px;font-size:9px;color:var(--text3)}
+  .item-card.r-gray{border-top:2px solid var(--rare-gray)}
+  .item-card.r-blue{border-top:2px solid var(--rare-blue)}
+  .item-card.r-purple{border-top:2px solid var(--rare-purple)}
+  .item-card.r-pink{border-top:2px solid var(--rare-pink)}
+  .item-card.r-red{border-top:2px solid var(--rare-red)}
+  .item-card.r-gold{border-top:2px solid var(--rare-gold)}
+  .item-price.r-gray{color:var(--rare-gray)}
+  .item-price.r-blue{color:var(--rare-blue)}
+  .item-price.r-purple{color:var(--rare-purple)}
+  .item-price.r-pink{color:var(--rare-pink)}
+  .item-price.r-red{color:var(--rare-red)}
+  .item-price.r-gold{color:var(--rare-gold)}
+
+  .open-controls{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap}
+  .qty-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 16px;color:var(--text);font-size:14px;cursor:pointer;transition:all .15s}
+  .qty-btn.active,.qty-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--bg4)}
+  .btn-open{background:linear-gradient(135deg,var(--blue2),var(--purple2));border:none;color:#fff;padding:12px 32px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:transform .15s,opacity .15s;font-family:'Rajdhani',sans-serif}
+  .btn-open:hover{transform:translateY(-1px)}
+  .btn-open:active{transform:scale(.97)}
+  .btn-open:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+  /* WIN MODAL */
+  .win-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:none;align-items:center;justify-content:center}
+  .win-overlay.show{display:flex}
+  .win-card{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:40px 48px;text-align:center;max-width:360px;width:90%;animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+  .win-emoji{font-size:72px;display:block;margin-bottom:16px;animation:float 2s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .win-label{font-size:13px;color:var(--text2);margin-bottom:4px;letter-spacing:2px;text-transform:uppercase}
+  .win-name{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;margin-bottom:4px}
+  .win-price{font-size:32px;font-weight:700;color:var(--gold);margin-bottom:24px}
+  .win-actions{display:flex;gap:8px}
+  .btn-sell{flex:1;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--green);padding:10px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+  .btn-sell:hover{background:rgba(16,185,129,.25)}
+  .btn-inv{flex:1;background:var(--bg4);border:1px solid var(--border2);color:var(--text);padding:10px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
+  .btn-inv:hover{border-color:var(--blue);color:var(--blue)}
+
+  /* ====== BATTLE PAGE ====== */
+  .battle-page{padding:24px}
+  .battle-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+  .btn-create-battle{background:linear-gradient(135deg,#7c3aed,#ec4899);border:none;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+  .battle-filters{display:flex;gap:6px;flex:1}
+  .battle-table{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .battle-table-head{display:grid;grid-template-columns:80px 1fr 120px 100px 80px 90px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+  .battle-table-row{display:grid;grid-template-columns:80px 1fr 120px 100px 80px 90px;padding:12px 16px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer;transition:background .15s}
+  .battle-table-row:hover{background:var(--bg3)}
+  .battle-table-row:last-child{border-bottom:none}
+  .mode-badge{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700}
+  .mode-1v1{color:var(--cyan)}
+  .mode-2v2{color:var(--purple)}
+  .mode-4p{color:var(--pink)}
+  .player-avatars{display:flex;gap:-4px}
+  .p-avatar{width:24px;height:24px;border-radius:50%;border:2px solid var(--bg2);background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-left:-6px}
+  .p-avatar:first-child{margin-left:0}
+
+  /* ====== UPGRADE PAGE ====== */
+  .upgrade-page{padding:24px;max-width:800px;margin:0 auto}
+  .upgrade-layout{display:grid;grid-template-columns:1fr 120px 1fr;gap:16px;align-items:center;margin-bottom:32px}
+  .upgrade-panel{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center}
+  .upgrade-panel h4{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+  .upgrade-big-emoji{font-size:56px;display:block;margin-bottom:8px}
+  .upgrade-item-name{font-size:13px;font-weight:500;margin-bottom:6px}
+  .upgrade-item-price{font-size:20px;font-weight:700;color:var(--gold)}
+  .upgrade-arrow{text-align:center;font-size:28px;color:var(--text3)}
+  .chance-display{text-align:center;margin-bottom:24px}
+  .chance-display .chance-num{font-family:'Rajdhani',sans-serif;font-size:56px;font-weight:700;color:var(--green);line-height:1}
+  .chance-display .chance-label{font-size:14px;color:var(--text2);margin-top:4px}
+  .wheel-container{position:relative;width:200px;height:200px;margin:0 auto 24px;border-radius:50%;overflow:hidden;border:3px solid var(--border2)}
+  .wheel-slice-win{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:50%}
+  .wheel-needle{position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);width:4px;height:50%;background:linear-gradient(to bottom,#fff,var(--gold));transform-origin:bottom center;border-radius:2px}
+
+  /* ====== PROFILE PAGE ====== */
+  .profile-page{padding:24px;max-width:800px;margin:0 auto}
+  .profile-header{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;gap:20px;align-items:center;margin-bottom:20px}
+  .profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;flex-shrink:0}
+  .profile-info h3{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px}
+  .profile-info .steam-id{font-size:12px;color:var(--text3);margin-bottom:8px}
+  .level-bar-wrap{display:flex;align-items:center;gap:10px}
+  .level-badge{background:linear-gradient(135deg,var(--blue2),var(--purple2));color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;white-space:nowrap}
+  .level-bar{flex:1;height:6px;background:var(--bg4);border-radius:3px;min-width:120px}
+  .level-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:3px}
+  .level-xp{font-size:11px;color:var(--text3);white-space:nowrap}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+  .stat-card{background:var(--bg4);border-radius:10px;padding:12px;text-align:center}
+  .stat-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff}
+  .stat-label{font-size:11px;color:var(--text3);margin-top:2px}
+  .referral-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:12px}
+  .referral-code{background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:8px 16px;font-family:monospace;font-size:14px;color:var(--gold);flex:1;text-align:center;letter-spacing:2px}
+  .btn-copy{background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;transition:all .15s;white-space:nowrap}
+  .btn-copy:hover{border-color:var(--blue);color:var(--blue)}
+
+  /* ====== INVENTORY PAGE ====== */
+  .inventory-page{padding:24px}
+  .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+  .inv-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;position:relative}
+  .inv-item:hover{border-color:var(--border2);transform:translateY(-2px)}
+  .inv-item .inv-emoji{font-size:36px;text-align:center;margin-bottom:8px}
+  .inv-item .inv-name{font-size:12px;font-weight:500;margin-bottom:4px;line-height:1.3}
+  .inv-item .inv-price{font-size:14px;font-weight:700}
+  .inv-item .inv-rarity{font-size:10px;color:var(--text3);margin-bottom:8px}
+  .inv-actions{display:flex;gap:4px;margin-top:8px}
+  .inv-btn{flex:1;font-size:10px;padding:4px;border-radius:5px;border:1px solid var(--border);background:var(--bg4);color:var(--text2);cursor:pointer;transition:all .15s}
+  .inv-btn:hover{border-color:var(--blue);color:var(--blue)}
+  .inv-item.selected{border-color:var(--blue);background:var(--bg4)}
+  .inv-selected-check{position:absolute;top:8px;right:8px;width:18px;height:18px;background:var(--blue);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:#fff}
+  .inv-item.selected .inv-selected-check{display:flex}
+
+  /* Chat */
+  .chat-bubble{position:fixed;bottom:20px;right:20px;z-index:50}
+  .chat-toggle{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--blue2),var(--purple2));border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(79,142,247,.4)}
+  .chat-panel{position:absolute;bottom:60px;right:0;width:280px;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;overflow:hidden;display:none;flex-direction:column}
+  .chat-panel.open{display:flex}
+  .chat-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600}
+  .chat-messages{height:200px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px}
+  .chat-msg{font-size:12px;line-height:1.4}
+  .chat-msg .cm-nick{font-weight:600;margin-right:4px}
+  .chat-msg .cm-text{color:var(--text2)}
+  .chat-input-row{padding:8px;border-top:1px solid var(--border);display:flex;gap:6px}
+  .chat-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);outline:none}
+  .chat-send{background:var(--blue2);border:none;color:#fff;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px}
+</style>
+
+<h2 class="sr-only">CS2 Case Opening Platform — интерактивный прототип с навигацией по страницам</h2>
+
+<div class="app">
+  <nav>
+    <span class="nav-logo">CASEX</span>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showPage('home',this)">🏠 Главная</button>
+      <button class="nav-link" onclick="showPage('cases',this)">📦 Кейсы</button>
+      <button class="nav-link" onclick="showPage('battle',this)">⚔️ Battle</button>
+      <button class="nav-link" onclick="showPage('upgrade',this)">⬆️ Апгрейд</button>
+      <button class="nav-link" onclick="showPage('inventory',this)">🎒 Инвентарь</button>
+      <button class="nav-link" onclick="showPage('profile',this)">👤 Профиль</button>
+    </div>
+    <div class="nav-right">
+      <div class="balance" id="balance-display">💰 1 240.50 ₽</div>
+      <button class="btn-deposit">+ Пополнить</button>
+      <div class="avatar" title="Профиль">PL</div>
+    </div>
+  </nav>
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <h1><span>ОТКРОЙ КЕЙС</span><br>ВЫИГРАЙ РЕДКИЙ СКИН</h1>
+      <p>Тысячи кейсов, честный алгоритм Provably Fair, мгновенный вывод на Steam</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('cases',document.querySelectorAll('.nav-link')[1])">📦 Открыть кейс</button>
+        <button class="btn-outline" onclick="showPage('battle',document.querySelectorAll('.nav-link')[2])">⚔️ Начать Battle</button>
+      </div>
+    </div>
+
+    <div class="live-feed">
+      <div class="live-feed-inner" id="feed-inner"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">🔥 Популярные <span>кейсы</span></div>
+        <button class="see-all" onclick="showPage('cases',document.querySelectorAll('.nav-link')[1])">Все кейсы →</button>
+      </div>
+      <div class="cases-grid" id="home-cases-grid"></div>
+    </div>
+
+    <div class="section" style="padding-top:0">
+      <div class="section-header">
+        <div class="section-title">⚔️ Активные <span>батлы</span></div>
+        <button class="see-all" onclick="showPage('battle',document.querySelectorAll('.nav-link')[2])">Все батлы →</button>
+      </div>
+      <div class="battles-list" id="home-battles-list"></div>
+    </div>
+  </div>
+
+  <!-- CASES PAGE -->
+  <div class="page" id="page-cases">
+    <div class="cases-page">
+      <div class="filter-bar">
+        <input class="search-input" placeholder="🔍 Поиск кейса..." oninput="filterCases(this.value)">
+        <button class="filter-btn active" onclick="setCatFilter('all',this)">Все</button>
+        <button class="filter-btn" onclick="setCatFilter('official',this)">CS2 Official</button>
+        <button class="filter-btn" onclick="setCatFilter('custom',this)">Custom</button>
+        <button class="filter-btn" onclick="setCatFilter('premium',this)">Premium</button>
+        <button class="filter-btn" onclick="sortCases('cheap')">Сначала дешёвые</button>
+        <button class="filter-btn" onclick="sortCases('exp')">Сначала дорогие</button>
+      </div>
+      <div class="cases-grid" id="all-cases-grid"></div>
+    </div>
+  </div>
+
+  <!-- CASE OPEN PAGE -->
+  <div class="page" id="page-case-open">
+    <div class="case-open-page">
+      <button onclick="showPage('cases',document.querySelectorAll('.nav-link')[1])" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;margin-bottom:16px">← Назад к кейсам</button>
+      <div class="case-open-hero">
+        <span class="big-emoji" id="open-case-emoji">🗝️</span>
+        <h2 id="open-case-name">Кейс «Оружие»</h2>
+        <div class="case-open-price" id="open-case-price">199 ₽</div>
+      </div>
+
+      <div class="roulette-container">
+        <div class="roulette-track-wrap" style="height:112px">
+          <div class="roulette-pointer"></div>
+          <div class="roulette-track" id="roulette-track"></div>
+        </div>
+        <div class="rarity-bar">
+          <div class="rarity-dot" style="background:var(--rare-gray)"></div>
+          <div class="rarity-dot" style="background:var(--rare-blue)"></div>
+          <div class="rarity-dot" style="background:var(--rare-purple)"></div>
+          <div class="rarity-dot" style="background:var(--rare-pink)"></div>
+          <div class="rarity-dot" style="background:var(--rare-red)"></div>
+          <div class="rarity-dot" style="background:var(--rare-gold)"></div>
+          <span style="font-size:11px;color:var(--text3);margin-left:8px">Обычный → Золотой</span>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title" style="font-size:16px">Содержимое кейса</div>
+      </div>
+      <div class="items-grid" id="case-items-grid"></div>
+
+      <div class="open-controls">
+        <button class="qty-btn active" onclick="setQty(1,this)">×1</button>
+        <button class="qty-btn" onclick="setQty(2,this)">×2</button>
+        <button class="qty-btn" onclick="setQty(3,this)">×3</button>
+        <button class="qty-btn" onclick="setQty(5,this)">×5</button>
+        <button class="btn-open" id="open-btn" onclick="openCase()">🗝️ ОТКРЫТЬ КЕЙС — <span id="open-price-btn">199 ₽</span></button>
+      </div>
+      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text3)">
+        ✅ Provably Fair · 🔒 Честный алгоритм · ⚡ Мгновенный результат
+      </div>
+    </div>
+  </div>
+
+  <!-- BATTLE PAGE -->
+  <div class="page" id="page-battle">
+    <div class="battle-page">
+      <div class="battle-header">
+        <div class="section-title">⚔️ Case <span style="color:var(--purple)">Battle</span></div>
+        <div class="battle-filters">
+          <button class="filter-btn active">Все режимы</button>
+          <button class="filter-btn">1v1</button>
+          <button class="filter-btn">2v2</button>
+          <button class="filter-btn">FFA</button>
+        </div>
+        <button class="btn-create-battle" onclick="showCreateBattle()">+ Создать батл</button>
+      </div>
+
+      <div class="battle-table">
+        <div class="battle-table-head">
+          <div>Режим</div>
+          <div>Кейсы</div>
+          <div>Ставка</div>
+          <div>Игроки</div>
+          <div>Раунды</div>
+          <div>Статус</div>
+        </div>
+        <div id="battle-rows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPGRADE PAGE -->
+  <div class="page" id="page-upgrade">
+    <div class="upgrade-page">
+      <div class="section-title" style="margin-bottom:24px">⬆️ Апгрейд <span style="color:var(--blue)">скинов</span></div>
+      <div class="upgrade-layout">
+        <div class="upgrade-panel">
+          <h4>Ваш скин</h4>
+          <span class="upgrade-big-emoji" id="upg-from-emoji">🔫</span>
+          <div class="upgrade-item-name" id="upg-from-name">AK-47 | Redline</div>
+          <div class="upgrade-item-price" id="upg-from-price">800 ₽</div>
+        </div>
+        <div class="upgrade-arrow">→</div>
+        <div class="upgrade-panel">
+          <h4>Цель</h4>
+          <span class="upgrade-big-emoji" id="upg-to-emoji">🗡️</span>
+          <div class="upgrade-item-name" id="upg-to-name">Karambit | Fade</div>
+          <div class="upgrade-item-price" id="upg-to-price">3 200 ₽</div>
+        </div>
+      </div>
+
+      <div class="chance-display">
+        <div class="chance-num" id="upg-chance">25%</div>
+        <div class="chance-label">шанс успеха</div>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:8px">Целевой скин:</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="upg-targets"></div>
+      </div>
+
+      <div style="position:relative;height:8px;background:var(--bg4);border-radius:4px;margin-bottom:24px;overflow:hidden">
+        <div id="upg-bar" style="position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:4px;width:25%;transition:width .4s"></div>
+        <div id="upg-marker" style="position:absolute;top:-4px;bottom:-4px;width:3px;background:#fff;border-radius:2px;left:25%;transition:left .4s"></div>
+      </div>
+
+      <div style="text-align:center">
+        <button class="btn-primary" id="upg-btn" onclick="doUpgrade()">⬆️ Апгрейд за 800 ₽</button>
+      </div>
+
+      <div id="upg-result" style="margin-top:20px;text-align:center;font-size:18px;font-weight:600;display:none"></div>
+    </div>
+  </div>
+
+  <!-- INVENTORY PAGE -->
+  <div class="page" id="page-inventory">
+    <div class="inventory-page">
+      <div class="section-header">
+        <div class="section-title">🎒 Инвентарь <span style="color:var(--text3);font-size:14px;font-weight:400">(18 предметов)</span></div>
+        <div style="display:flex;gap:6px">
+          <button class="filter-btn active">Все</button>
+          <button class="filter-btn">В инвентаре</button>
+          <button class="filter-btn">Выведено</button>
+          <button class="filter-btn">Продано</button>
+        </div>
+      </div>
+      <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:13px;color:var(--text2)">Всего стоимость: <span style="color:var(--gold);font-weight:700">14 250 ₽</span></div>
+        <button style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:var(--green);padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Продать всё</button>
+      </div>
+      <div class="inv-grid" id="inv-grid"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div class="page" id="page-profile">
+    <div class="profile-page">
+      <div class="profile-header">
+        <div class="profile-avatar">PL</div>
+        <div class="profile-info" style="flex:1">
+          <h3>Player_999</h3>
+          <div class="steam-id">Steam ID: 76561198123456789</div>
+          <div class="level-bar-wrap">
+            <div class="level-badge">Lv.42</div>
+            <div class="level-bar"><div class="level-bar-fill" style="width:68%"></div></div>
+            <div class="level-xp">6800 / 10000 XP</div>
+          </div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val">1 247</div><div class="stat-label">Кейсов открыто</div></div>
+        <div class="stat-card"><div class="stat-val">89</div><div class="stat-label">Батлов сыграно</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--gold)">18 500 ₽</div><div class="stat-label">Лучший дроп</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--green)">+12 400 ₽</div><div class="stat-label">Профит</div></div>
+      </div>
+      <div style="margin-top:20px">
+        <div class="section-title" style="font-size:16px;margin-bottom:12px">🔗 Реферальная программа</div>
+        <div class="referral-box">
+          <div class="referral-code" id="ref-code">CASEX-PL999</div>
+          <button class="btn-copy" onclick="copyRef()">📋 Копировать</button>
+          <button class="btn-copy" onclick="copyRef()">🔗 Ссылка</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
+          <div class="stat-card"><div class="stat-val">23</div><div class="stat-label">Рефералы</div></div>
+          <div class="stat-card"><div class="stat-val" style="color:var(--green)">2 340 ₽</div><div class="stat-label">Заработано</div></div>
+          <div class="stat-card"><div class="stat-val">5%</div><div class="stat-label">Процент</div></div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="section-title" style="font-size:16px;margin-bottom:12px">📅 Ежедневный бонус</div>
+        <div style="background:var(--bg3);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:16px;display:flex;align-items:center;gap:16px">
+          <span style="font-size:40px">🎁</span>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:600;margin-bottom:4px">Ежедневный фриспин доступен!</div>
+            <div style="font-size:12px;color:var(--text2)">Бесплатный кейс каждые 24 часа</div>
+          </div>
+          <button class="btn-primary" style="font-size:13px;padding:8px 20px" onclick="claimBonus()">Забрать 🎁</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WIN OVERLAY -->
+<div class="win-overlay" id="win-overlay">
+  <div class="win-card">
+    <span class="win-emoji" id="win-emoji">🔫</span>
+    <div class="win-label">Вы получили</div>
+    <div class="win-name" id="win-name">AK-47 | Redline</div>
+    <div class="win-price" id="win-price">1 200 ₽</div>
+    <div class="win-actions">
+      <button class="btn-sell" onclick="sellItem()">💰 Продать</button>
+      <button class="btn-inv" onclick="toInventory()">🎒 В инвентарь</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="chat-bubble">
+  <div class="chat-panel" id="chat-panel">
+    <div class="chat-head">
+      💬 Глобальный чат
+      <span style="font-size:11px;color:var(--green)">● 1 247 онлайн</span>
+    </div>
+    <div class="chat-messages" id="chat-msgs"></div>
+    <div class="chat-input-row">
+      <input class="chat-input" placeholder="Сообщение..." id="chat-inp" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+  <button class="chat-toggle" onclick="toggleChat()">💬</button>
+</div>
+
+<script>
+const CASES=[
+  {id:0,emoji:'🗝️',name:'Кейс «Оружие»',price:199,tier:'blue',cat:'official'},
+  {id:1,emoji:'💎',name:'Кейс «Коллекционный»',price:499,tier:'purple',cat:'premium'},
+  {id:2,emoji:'🔥',name:'Кейс «Огонь и лёд»',price:299,tier:'red',cat:'custom'},
+  {id:3,emoji:'⭐',name:'Кейс «Звёздный»',price:149,tier:'blue',cat:'official'},
+  {id:4,emoji:'🏆',name:'Кейс «Чемпион»',price:799,tier:'gold',cat:'premium',badge:'hot'},
+  {id:5,emoji:'🌊',name:'Кейс «Стихия»',price:249,tier:'blue',cat:'custom'},
+  {id:6,emoji:'🎭',name:'Кейс «Маски»',price:399,tier:'purple',cat:'custom',badge:'new'},
+  {id:7,emoji:'⚡',name:'Кейс «Молния»',price:179,tier:'blue',cat:'official'},
+  {id:8,emoji:'🦋',name:'Кейс «Бабочка»',price:1299,tier:'gold',cat:'premium',badge:'new'},
+];
+
+const ITEMS=[
+  {emoji:'🔫',name:'AK-47 | Redline',price:1200,rarity:'r-red',chance:'0.5%'},
+  {emoji:'🗡️',name:'Karambit | Fade',price:18500,rarity:'r-gold',chance:'0.1%'},
+  {emoji:'🔪',name:'M9 Bayonet | Tiger',price:8200,rarity:'r-gold',chance:'0.2%'},
+  {emoji:'🎯',name:'AWP | Dragon Lore',price:45000,rarity:'r-gold',chance:'0.05%'},
+  {emoji:'💜',name:'Glock | Fade',price:3400,rarity:'r-pink',chance:'1%'},
+  {emoji:'🌀',name:'USP-S | Kill Confirmed',price:2100,rarity:'r-purple',chance:'3%'},
+  {emoji:'🔵',name:'Desert Eagle | Blaze',price:1800,rarity:'r-purple',chance:'4%'},
+  {emoji:'⚡',name:'P250 | Asiimov',price:600,rarity:'r-blue',chance:'12%'},
+  {emoji:'🟢',name:'MP9 | Hypnotic',price:280,rarity:'r-blue',chance:'15%'},
+  {emoji:'⚪',name:'Nova | Hyper Beast',price:120,rarity:'r-gray',chance:'30%'},
+  {emoji:'⚪',name:'Tec-9 | Nuclear Threat',price:90,rarity:'r-gray',chance:'34.15%'},
+];
+
+const BATTLES=[
+  {mode:'1v1',cases:['Оружие','Огонь'],bet:'398 ₽',players:['A','B'],rounds:2,status:'waiting'},
+  {mode:'2v2',cases:['Коллекц.','Звёздный'],bet:'1296 ₽',players:['X','Y','Z','W'],rounds:4,status:'live'},
+  {mode:'FFA',cases:['Маски'],bet:'399 ₽',players:['P','Q','R'],rounds:1,status:'waiting'},
+  {mode:'1v1',cases:['Молния'],bet:'179 ₽',players:['M'],rounds:1,status:'waiting'},
+  {mode:'2v2',cases:['Чемпион','Оружие'],bet:'1596 ₽',players:['A','B','C','D'],rounds:3,status:'live'},
+];
+
+const FEED_ITEMS=[
+  {nick:'Dragon99',emoji:'🗡️',item:'Karambit | Fade',price:'18 500 ₽',color:'var(--rare-gold)'},
+  {nick:'Sniperx',emoji:'🎯',item:'AWP | Dragon Lore',price:'45 000 ₽',color:'var(--rare-gold)'},
+  {nick:'Pistol_K',emoji:'💜',item:'Glock | Fade',price:'3 400 ₽',color:'var(--rare-pink)'},
+  {nick:'Player77',emoji:'🔫',item:'AK-47 | Redline',price:'1 200 ₽',color:'var(--rare-red)'},
+  {nick:'CS_Pro',emoji:'🔵',item:'Desert Eagle | Blaze',price:'1 800 ₽',color:'var(--rare-purple)'},
+  {nick:'Knife_G',emoji:'🔪',item:'M9 Bayonet | Tiger',price:'8 200 ₽',color:'var(--rare-gold)'},
+];
+
+const CHAT_MSGS=[
+  {nick:'Dragon99',color:'var(--gold)',text:'Только что выбил Karambit!! 🔥'},
+  {nick:'Sniperx',color:'var(--blue)',text:'gg wp, нереально'},
+  {nick:'CS_Pro',color:'var(--purple)',text:'Кто на 1v1?'},
+  {nick:'Player77',color:'var(--text)',text:'уже 3й раз открываю и ничего..'},
+  {nick:'Knife_G',color:'var(--green)',text:'зашёл впервые — сразу нож 💎'},
+];
+
+let currentOpenCase=0, openQty=1, balance=1240.50;
+
+function updateBalance(){document.getElementById('balance-display').textContent='💰 '+balance.toLocaleString('ru-RU',{minimumFractionDigits:2})+'₽'}
+
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+
+function openCasePage(caseId){
+  currentOpenCase=caseId;
+  const c=CASES[caseId];
+  document.getElementById('open-case-emoji').textContent=c.emoji;
+  document.getElementById('open-case-name').textContent=c.name;
+  document.getElementById('open-case-price').textContent=c.price+' ₽';
+  document.getElementById('open-price-btn').textContent=c.price+' ₽';
+  openQty=1;
+  buildRoulette();
+  buildItemsGrid();
+  showPage('case-open',null);
+}
+
+function buildCaseCard(c,container){
+  const d=document.createElement('div');
+  d.className='case-card tier-'+c.tier;
+  d.innerHTML=`
+    ${c.badge?`<span class="case-badge badge-${c.badge}">${c.badge==='new'?'NEW':'HOT'}</span>`:''}
+    <div class="case-img">${c.emoji}</div>
+    <div class="case-name">${c.name}</div>
+    <div class="case-price">${c.price} ₽</div>`;
+  d.onclick=()=>openCasePage(c.id);
+  container.appendChild(d);
+}
+
+function renderCasesGrid(arr,containerId){
+  const g=document.getElementById(containerId);
+  g.innerHTML='';
+  arr.forEach(c=>buildCaseCard(c,g));
+}
+
+function buildRoulette(){
+  const track=document.getElementById('roulette-track');
+  track.style.transition='none';
+  track.style.transform='translateX(0)';
+  track.innerHTML='';
+  const pool=[];
+  for(let i=0;i<60;i++) pool.push(ITEMS[Math.floor(Math.random()*ITEMS.length)]);
+  pool.forEach((item,i)=>{
+    const el=document.createElement('div');
+    el.className='roulette-item';
+    el.innerHTML=`<div class="r-emoji">${item.emoji}</div><div class="r-name">${item.name}</div>`;
+    el.style.borderColor='var(--'+item.rarity.replace('r-','rare-')+')';
+    track.appendChild(el);
+  });
+}
+
+function buildItemsGrid(){
+  const g=document.getElementById('case-items-grid');
+  g.innerHTML='';
+  ITEMS.forEach(item=>{
+    const d=document.createElement('div');
+    d.className='item-card '+item.rarity;
+    d.innerHTML=`
+      <div class="item-emoji">${item.emoji}</div>
+      <div class="item-name">${item.name}</div>
+      <div class="item-price ${item.rarity}">${item.price.toLocaleString('ru-RU')} ₽</div>
+      <div class="item-chance">${item.chance}</div>`;
+    g.appendChild(d);
+  });
+}
+
+function setQty(n,btn){
+  openQty=n;
+  document.querySelectorAll('.qty-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const c=CASES[currentOpenCase];
+  document.getElementById('open-price-btn').textContent=(c.price*n).toLocaleString('ru-RU')+' ₽';
+}
+
+function openCase(){
+  const cost=CASES[currentOpenCase].price*openQty;
+  if(balance<cost){alert('Недостаточно средств! Пополните баланс.');return;}
+  balance-=cost;
+  updateBalance();
+  const btn=document.getElementById('open-btn');
+  btn.disabled=true;
+  buildRoulette();
+  const track=document.getElementById('roulette-track');
+  const items=track.querySelectorAll('.roulette-item');
+  const itemW=106;
+  const winIdx=Math.floor(Math.random()*(ITEMS.length));
+  const winItem=ITEMS[winIdx];
+  const trackCenter=Math.floor(items.length/2);
+  const targetX=-(trackCenter*itemW)+(Math.floor(Math.random()*20)-10);
+  setTimeout(()=>{
+    track.style.transition='transform 4s cubic-bezier(.17,.67,.12,.99)';
+    track.style.transform='translateX('+targetX+'px)';
+    setTimeout(()=>{
+      showWin(winItem);
+      btn.disabled=false;
+    },4200);
+  },50);
+}
+
+function showWin(item){
+  document.getElementById('win-emoji').textContent=item.emoji;
+  document.getElementById('win-name').textContent=item.name;
+  document.getElementById('win-price').textContent=item.price.toLocaleString('ru-RU')+' ₽';
+  document.getElementById('win-overlay').classList.add('show');
+}
+
+function sellItem(){
+  const priceText=document.getElementById('win-price').textContent;
+  const price=parseInt(priceText.replace(/\D/g,''));
+  balance+=price;
+  updateBalance();
+  document.getElementById('win-overlay').classList.remove('show');
+}
+
+function toInventory(){
+  document.getElementById('win-overlay').classList.remove('show');
+}
+
+function buildBattleRows(){
+  const c=document.getElementById('battle-rows');
+  c.innerHTML='';
+  BATTLES.forEach(b=>{
+    const div=document.createElement('div');
+    div.className='battle-table-row';
+    const modeClass=b.mode==='1v1'?'mode-1v1':b.mode==='2v2'?'mode-2v2':'mode-4p';
+    const statusClass=b.status==='live'?'status-live':'status-waiting';
+    const statusText=b.status==='live'?'🔴 LIVE':'⏳ Ждёт';
+    const avatars=b.players.map(p=>`<div class="p-avatar">${p}</div>`).join('');
+    div.innerHTML=`
+      <div class="mode-badge ${modeClass}">${b.mode}</div>
+      <div class="battle-cases">${b.cases.map(x=>`<span class="battle-case-pill">${x}</span>`).join('')}</div>
+      <div class="battle-bet">${b.bet}</div>
+      <div class="player-avatars" style="display:flex">${avatars}</div>
+      <div style="font-size:12px;color:var(--text2)">${b.rounds} раунд${b.rounds>1?'а':''}</div>
+      <div><span class="battle-status ${statusClass}">${statusText}</span></div>`;
+    c.appendChild(div);
+  });
+}
+
+function buildHomeBattles(){
+  const c=document.getElementById('home-battles-list');
+  c.innerHTML='';
+  BATTLES.slice(0,3).forEach(b=>{
+    const div=document.createElement('div');
+    div.className='battle-row';
+    const statusClass=b.status==='live'?'status-live':'status-waiting';
+    const statusText=b.status==='live'?'🔴 LIVE':'⏳ Ждёт';
+    div.innerHTML=`
+      <div class="battle-mode">${b.mode}</div>
+      <div class="battle-cases">${b.cases.map(x=>`<span class="battle-case-pill">${x}</span>`).join('')}</div>
+      <div class="battle-bet">${b.bet}</div>
+      <div class="battle-players">${b.players.length}/${b.mode==='1v1'?2:b.mode==='2v2'?4:4} игр.</div>
+      <div><span class="battle-status ${statusClass}">${statusText}</span></div>`;
+    div.onclick=()=>showPage('battle',document.querySelectorAll('.nav-link')[2]);
+    c.appendChild(div);
+  });
+}
+
+function buildFeed(){
+  const inner=document.getElementById('feed-inner');
+  const items=[...FEED_ITEMS,...FEED_ITEMS];
+  inner.innerHTML='';
+  items.forEach(f=>{
+    const d=document.createElement('div');
+    d.className='feed-item';
+    d.innerHTML=`
+      <div class="feed-avatar" style="background:${f.color}22;color:${f.color}">${f.nick[0]}</div>
+      <span class="feed-nick">${f.nick}</span>
+      <span style="font-size:14px">${f.emoji}</span>
+      <span class="feed-item-name" style="color:${f.color}">${f.item}</span>
+      <span class="feed-price" style="color:${f.color}">${f.price}</span>`;
+    inner.appendChild(d);
+  });
+}
+
+function buildInventory(){
+  const g=document.getElementById('inv-grid');
+  g.innerHTML='';
+  const invItems=[...ITEMS,...ITEMS.slice(0,7)];
+  invItems.forEach((item,i)=>{
+    const d=document.createElement('div');
+    d.className='inv-item';
+    d.innerHTML=`
+      <div class="inv-selected-check">✓</div>
+      <div class="inv-emoji" style="text-align:center">${item.emoji}</div>
+      <div class="inv-name">${item.name}</div>
+      <div class="inv-rarity">${item.rarity.replace('r-','').toUpperCase()}</div>
+      <div class="inv-price ${item.rarity}">${item.price.toLocaleString('ru-RU')} ₽</div>
+      <div class="inv-actions">
+        <button class="inv-btn">💰</button>
+        <button class="inv-btn">📤 Steam</button>
+        <button class="inv-btn">⬆️</button>
+      </div>`;
+    d.onclick=()=>d.classList.toggle('selected');
+    g.appendChild(d);
+  });
+}
+
+function buildUpgrade(){
+  const targets=document.getElementById('upg-targets');
+  targets.innerHTML='';
+  const tItems=[ITEMS[2],ITEMS[1],ITEMS[3]];
+  tItems.forEach((item,i)=>{
+    const btn=document.createElement('button');
+    btn.className='qty-btn'+(i===0?' active':'');
+    btn.innerHTML=item.emoji+' '+item.name+' — '+item.price.toLocaleString('ru-RU')+'₽';
+    btn.style.fontSize='12px';
+    btn.onclick=()=>{
+      document.querySelectorAll('#upg-targets .qty-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('upg-to-emoji').textContent=item.emoji;
+      document.getElementById('upg-to-name').textContent=item.name;
+      document.getElementById('upg-to-price').textContent=item.price.toLocaleString('ru-RU')+' ₽';
+      const chance=Math.min(95,Math.round(800/item.price*100));
+      document.getElementById('upg-chance').textContent=chance+'%';
+      document.getElementById('upg-bar').style.width=chance+'%';
+      document.getElementById('upg-marker').style.left=chance+'%';
+    };
+    targets.appendChild(btn);
+  });
+}
+
+function doUpgrade(){
+  const chanceText=document.getElementById('upg-chance').textContent;
+  const chance=parseInt(chanceText);
+  const roll=Math.random()*100;
+  const res=document.getElementById('upg-result');
+  const btn=document.getElementById('upg-btn');
+  btn.disabled=true;
+  res.style.display='none';
+  setTimeout(()=>{
+    if(roll<chance){
+      res.style.display='block';
+      res.style.color='var(--green)';
+      res.textContent='✅ Апгрейд успешен! '+document.getElementById('upg-to-emoji').textContent+' '+document.getElementById('upg-to-name').textContent+' добавлен в инвентарь!';
+    }else{
+      res.style.display='block';
+      res.style.color='var(--red)';
+      res.textContent='❌ Провал. Скин сгорел. Попробуйте ещё раз!';
+    }
+    btn.disabled=false;
+  },800);
+}
+
+let catFilter='all';
+function filterCases(q){
+  const f=CASES.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())&&(catFilter==='all'||c.cat===catFilter));
+  renderCasesGrid(f,'all-cases-grid');
+}
+function setCatFilter(cat,btn){
+  catFilter=cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filterCases(document.querySelector('.search-input').value);
+}
+function sortCases(dir){
+  const sorted=[...CASES].sort((a,b)=>dir==='cheap'?a.price-b.price:b.price-a.price);
+  renderCasesGrid(sorted,'all-cases-grid');
+}
+
+function buildChatMsgs(){
+  const c=document.getElementById('chat-msgs');
+  CHAT_MSGS.forEach(m=>{
+    const d=document.createElement('div');
+    d.className='chat-msg';
+    d.innerHTML=`<span class="cm-nick" style="color:${m.color}">${m.nick}:</span><span class="cm-text">${m.text}</span>`;
+    c.appendChild(d);
+  });
+  c.scrollTop=c.scrollHeight;
+}
+function sendChat(){
+  const inp=document.getElementById('chat-inp');
+  if(!inp.value.trim())return;
+  const c=document.getElementById('chat-msgs');
+  const d=document.createElement('div');
+  d.className='chat-msg';
+  d.innerHTML=`<span class="cm-nick" style="color:var(--blue)">Player_999:</span><span class="cm-text">${inp.value}</span>`;
+  c.appendChild(d);
+  c.scrollTop=c.scrollHeight;
+  inp.value='';
+}
+function toggleChat(){
+  document.getElementById('chat-panel').classList.toggle('open');
+}
+
+function showCreateBattle(){
+  alert('Создание батла: выберите кейсы, режим (1v1/2v2/FFA) и нажмите «Создать». В полной версии здесь будет модальное окно.');
+}
+function claimBonus(){
+  const bonus=ITEMS[Math.floor(Math.random()*3)+8];
+  balance+=bonus.price;
+  updateBalance();
+  alert('🎁 Вы получили бонус! '+bonus.emoji+' '+bonus.name+' ('+bonus.price+' ₽) зачислено на баланс!');
+}
+function copyRef(){
+  alert('Реферальный код скопирован: CASEX-PL999');
+}
+
+renderCasesGrid(CASES.slice(0,6),'home-cases-grid');
+renderCasesGrid(CASES,'all-cases-grid');
+buildHomeBattles();
+buildBattleRows();
+buildFeed();
+buildInventory();
+buildUpgrade();
+buildChatMsgs();
+updateBalance();
+</script>
