@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 
 function initChatSocket(io) {
   const chatNsp = io.of('/chat');
-  // const filter = new Filter(); // enable profanity filter in production
 
   chatNsp.use((socket, next) => {
     const token = socket.handshake.auth?.token;
