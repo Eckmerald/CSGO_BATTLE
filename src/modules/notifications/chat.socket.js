@@ -1,6 +1,5 @@
 // src/modules/notifications/chat.socket.js
 const jwt = require('jsonwebtoken');
-const Filter = require('bad-words'); // npm install bad-words
 
 function initChatSocket(io) {
   const chatNsp = io.of('/chat');
