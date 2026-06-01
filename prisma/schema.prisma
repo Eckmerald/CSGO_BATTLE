@@ -1,0 +1,280 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Users ────────────────────────────────────────────────────
+model User {
+  id            String   @id @default(uuid())
+  steamId       String?  @unique @map("steam_id")
+  email         String?  @unique
+  username      String
+  avatar        String?
+  balance       Decimal  @default(0) @db.Decimal(12, 2)
+  xp            Int      @default(0)
+  level         Int      @default(1)
+  referralCode  String   @unique @map("referral_code")
+  referredBy    String?  @map("ref_by")
+  isBanned      Boolean  @default(false) @map("is_banned")
+  banReason     String?  @map("ban_reason")
+  banExpiresAt  DateTime? @map("ban_expires_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  referrer        User?           @relation("Referrals", fields: [referredBy], references: [id])
+  referrals       User[]          @relation("Referrals")
+  transactions    Transaction[]
+  inventory       UserInventory[]
+  battles         BattlePlayer[]
+  withdrawals     Withdrawal[]
+  promoUses       PromoCodeUse[]
+  dailyBonuses    DailyBonus[]
+  sessions        UserSession[]
+
+  @@map("users")
+}
+
+model UserSession {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  ip        String?
+  userAgent String?  @map("user_agent")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_sessions")
+}
+
+// ─── Cases ────────────────────────────────────────────────────
+model Case {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  price       Decimal  @db.Decimal(10, 2)
+  imageUrl    String?  @map("image_url")
+  category    String   // official | custom | premium
+  isActive    Boolean  @default(true) @map("is_active")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  items         CaseItem[]
+  battleCases   BattleCase[]
+  openResults   CaseOpenResult[]
+
+  @@map("cases")
+}
+
+model Item {
+  id                  String  @id @default(uuid())
+  steamMarketHashName String  @unique @map("steam_market_hash_name")
+  name                String
+  rarity              String  // gray | blue | purple | pink | red | gold
+  imageUrl            String? @map("image_url")
+  marketPrice         Decimal @db.Decimal(12, 2) @map("market_price")
+  type                String  // weapon | knife | glove | sticker
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  caseItems     CaseItem[]
+  inventory     UserInventory[]
+  openResults   CaseOpenResult[]
+  battleResults BattleCaseResult[]
+
+  @@map("items")
+}
+
+model CaseItem {
+  id          String  @id @default(uuid())
+  caseId      String  @map("case_id")
+  itemId      String  @map("item_id")
+  probability Decimal @db.Decimal(8, 6) // e.g. 0.001 = 0.1%
+  minPrice    Decimal? @db.Decimal(10, 2) @map("min_price")
+  maxPrice    Decimal? @db.Decimal(10, 2) @map("max_price")
+
+  case Case @relation(fields: [caseId], references: [id])
+  item Item @relation(fields: [itemId], references: [id])
+
+  @@map("case_items")
+}
+
+model CaseOpenResult {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  caseId       String   @map("case_id")
+  itemId       String   @map("item_id")
+  serverSeed   String   @map("server_seed")
+  clientSeed   String   @map("client_seed")
+  nonce        Int
+  resultHash   String   @map("result_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  case Case @relation(fields: [caseId], references: [id])
+  item Item @relation(fields: [itemId], references: [id])
+
+  @@map("case_open_results")
+}
+
+// ─── Battles ──────────────────────────────────────────────────
+model Battle {
+  id          String   @id @default(uuid())
+  creatorId   String   @map("creator_id")
+  mode        String   // 1v1 | 2v2 | 3v3 | ffa
+  gameMode    String   @default("normal") @map("game_mode") // normal | crazy
+  status      String   @default("waiting") // waiting | countdown | active | finished | cancelled
+  winnerId    String?  @map("winner_id")
+  totalValue  Decimal? @db.Decimal(12, 2) @map("total_value")
+  maxPlayers  Int      @map("max_players")
+  isPrivate   Boolean  @default(false) @map("is_private")
+  inviteCode  String?  @unique @map("invite_code")
+  createdAt   DateTime @default(now()) @map("created_at")
+  finishedAt  DateTime? @map("finished_at")
+
+  players     BattlePlayer[]
+  cases       BattleCase[]
+  results     BattleCaseResult[]
+
+  @@map("battles")
+}
+
+model BattleCase {
+  id       String @id @default(uuid())
+  battleId String @map("battle_id")
+  caseId   String @map("case_id")
+  order    Int
+
+  battle Battle @relation(fields: [battleId], references: [id])
+  case   Case   @relation(fields: [caseId], references: [id])
+
+  @@map("battle_cases")
+}
+
+model BattlePlayer {
+  id         String   @id @default(uuid())
+  battleId   String   @map("battle_id")
+  userId     String   @map("user_id")
+  slot       Int
+  totalValue Decimal  @default(0) @db.Decimal(12, 2) @map("total_value")
+  isBot      Boolean  @default(false) @map("is_bot")
+  joinedAt   DateTime @default(now()) @map("joined_at")
+
+  battle Battle @relation(fields: [battleId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("battle_players")
+}
+
+model BattleCaseResult {
+  id       String @id @default(uuid())
+  battleId String @map("battle_id")
+  userId   String @map("user_id")
+  caseId   String @map("case_id")
+  itemId   String @map("item_id")
+  round    Int
+
+  battle Battle @relation(fields: [battleId], references: [id])
+  item   Item   @relation(fields: [itemId], references: [id])
+
+  @@map("battle_case_results")
+}
+
+// ─── Transactions & Payments ──────────────────────────────────
+model Transaction {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  type          String   // deposit | withdrawal | case_open | battle_win | battle_loss | sell_item | promo_bonus | referral_bonus | refund
+  amount        Decimal  @db.Decimal(12, 2)
+  currency      String   @default("RUB")
+  status        String   @default("pending") // pending | completed | failed | cancelled
+  paymentMethod String?  @map("payment_method")
+  externalId    String?  @map("external_id")
+  meta          Json?    // extra data
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("transactions")
+}
+
+model Withdrawal {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  method      String   // steam | card | crypto | yoomoney
+  amount      Decimal? @db.Decimal(12, 2)
+  itemId      String?  @map("item_id")
+  tradeUrl    String?  @map("trade_url")
+  address     String?  // crypto address / card
+  status      String   @default("pending") // pending | processing | completed | failed
+  processedAt DateTime? @map("processed_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("withdrawals")
+}
+
+// ─── Inventory ────────────────────────────────────────────────
+model UserInventory {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  itemId     String   @map("item_id")
+  status     String   @default("in_inventory") // in_inventory | withdrawn | sold
+  sourceType String   @map("source_type") // case_open | battle_win | upgrade_win
+  sourceId   String?  @map("source_id")
+  receivedAt DateTime @default(now()) @map("received_at")
+
+  user User @relation(fields: [userId], references: [id])
+  item Item @relation(fields: [itemId], references: [id])
+
+  @@map("user_inventory")
+}
+
+// ─── Promo & Referrals ────────────────────────────────────────
+model PromoCode {
+  id           String    @id @default(uuid())
+  code         String    @unique
+  bonusType    String    @map("bonus_type") // percent | fixed
+  bonusValue   Decimal   @db.Decimal(10, 2) @map("bonus_value")
+  minDeposit   Decimal?  @db.Decimal(10, 2) @map("min_deposit")
+  maxUses      Int?      @map("max_uses")
+  usedCount    Int       @default(0) @map("used_count")
+  isActive     Boolean   @default(true) @map("is_active")
+  expiresAt    DateTime? @map("expires_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  uses PromoCodeUse[]
+
+  @@map("promo_codes")
+}
+
+model PromoCodeUse {
+  id          String   @id @default(uuid())
+  promoCodeId String   @map("promo_code_id")
+  userId      String   @map("user_id")
+  usedAt      DateTime @default(now()) @map("used_at")
+
+  promoCode PromoCode @relation(fields: [promoCodeId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([promoCodeId, userId])
+  @@map("promo_code_uses")
+}
+
+model DailyBonus {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  claimedAt DateTime @default(now()) @map("claimed_at")
+  bonus     Decimal  @db.Decimal(10, 2)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("daily_bonuses")
+}
